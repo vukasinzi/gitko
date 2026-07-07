@@ -20,6 +20,7 @@ public class Index
         if (!File.Exists(path))
         {
             Entries = new();
+            return;
         }
         var json = File.ReadAllText(path);
         Entries = JsonSerializer.Deserialize<Dictionary<string,string>>(json) ?? new();

@@ -17,31 +17,47 @@ public class AddCommand : Command
 
     public override void Run()
     {
-        ObjectStore objectStore = new();
         string path = Helper.LocatePath(args[0]);
 
         if (!Helper.IsInsideRootDirectory(path))
             throw new ArgumentException("Fajl mora biti unutar gitko repozitorijuma");
 
-        if (!File.Exists(path))
-            throw new FileNotFoundException("Fajl koji želite dodati nepostoji");
-
-        string rootPath = Helper.LocateRootDirectory();
-        string relativePath = Path.GetRelativePath(rootPath, path);
-        relativePath = relativePath.Replace("\\", "/");
+        if (!Path.Exists(path))
+            throw new DirectoryNotFoundException("Direktorijum/Fajl koji želite dodati ne postoji");
 
         Index index = new Index();
         index.Load();
-        byte[] content = File.ReadAllBytes(path);
 
+        if (Directory.Exists(path))
+        {
+            foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                AddFile(file, index);
+        }
+        else
+        {
+            AddFile(path, index);
+        }
+
+        index.Save();
+    }
+
+    private void AddFile(string path, Index index)
+    {
+        ObjectStore objectStore = new();
+        string rootPath = Helper.LocateRootDirectory();
+        string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
+
+        if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
+            return;
+        
+        byte[] content = File.ReadAllBytes(path);
         Response resp = objectStore.Store(content);
-        if (resp.Success == false)
+
+        if (!resp.Success)
             throw new ArgumentException(resp.Message);
 
-        if(resp.Data == null)
-            throw new FileNotFoundException("Fajl koji želite dodati nepostoji");
-        string d = (string)resp.Data;
-        index.Add(relativePath, d);
-        index.Save();
+        string hash = (string)resp.Data;
+        index.Add(relativePath, hash);
+        Console.WriteLine($"Dodat {relativePath}");
     }
 }
