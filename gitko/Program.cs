@@ -1,14 +1,17 @@
-﻿
+﻿using gitko.CLI;
 
-using gitko.CLI;
+namespace gitko;
 
-
-string? _args = Console.ReadLine();
-if (string.IsNullOrEmpty(_args))
+public class Program
 {
-    Console.Write("$*@$&(@%^(@$*@)#(_");
-    return;
-}
-string[] argss = _args.Split(' ');
+    public static void Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Usage: gitko <command> [arguments]");
+            return;
+        }
 
-Parser.ParseAndExecute(argss);
+        Parser.ParseAndExecute(args);
+    }
+}

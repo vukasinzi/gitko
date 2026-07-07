@@ -13,14 +13,17 @@ public static class Parser
 
         switch (command)
         {
-           case "help":
-               break;
-           case "version":
-               Console.WriteLine("Trenutna verzija gitka je "+ Helper.UcitajConfig()["Version"]?.ToString());
-               break;
-           case "init":
-               new InitCommand(arguments).Execute();
-               break;
+            case "help":
+                break;
+            case "version":
+                Console.WriteLine("Trenutna verzija gitka je "+ Helper.LoadConfig()["Version"]?.ToString());
+                break;
+            case "init":
+                new InitCommand(arguments).Execute();
+                break;
+            case "add":
+                new AddCommand(arguments).Execute();
+                break;
         }
     }
 }

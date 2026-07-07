@@ -2,18 +2,16 @@ namespace gitko.CLI;
 
 public class InitCommand : Command
 {
-    public InitCommand(string[] args)
+    public InitCommand(string[] args) : base(args) { }
+
+    public override bool ValidateArguments()
     {
-        this.args = args;
-    }
-    public override bool ValidateArguments(string[] arguments)
-    {
-        if(args.Length != 0)
+        if (args.Length != 0)
             throw new ArgumentException("Init zahteva 0 argumenata");
         return true;
     }
 
-    public override void Run(string[] arguments)
+    public override void Run()
     {
         string currentDir = Directory.GetCurrentDirectory();
         string minigitDir = Path.Combine(currentDir, ".gitko");

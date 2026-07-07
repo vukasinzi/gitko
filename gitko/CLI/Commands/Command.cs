@@ -1,20 +1,19 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace gitko.CLI;
-
 public abstract class Command
 {
-    [Required]
-    public string[] args;
-    
+    public string[] args { get; }
+
+    protected Command(string[] args)
+    {
+        this.args = args;
+    }
+
     public void Execute()
     {
         try
         {
-            if (!ValidateArguments(args))
+            if (!ValidateArguments())
                 return;
-            Run(args);
-
+            Run();
         }
         catch (Exception x)
         {
@@ -22,10 +21,9 @@ public abstract class Command
         }
     }
 
-    public abstract void Run(string [] arguments);
-  
+    public abstract void Run();
 
-    public virtual bool ValidateArguments(string[] arguments)
+    public virtual bool ValidateArguments()
     {
         return true;
     }
