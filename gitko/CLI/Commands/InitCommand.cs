@@ -2,7 +2,15 @@ namespace gitko.CLI;
 
 public class InitCommand : Command
 {
-    public InitCommand(string[] args) : base(args) { }
+    private string gitkoDir;
+
+    public InitCommand(string[] args) : base(args)
+    {
+        string currentDir = Directory.GetCurrentDirectory();
+        gitkoDir = Path.Combine(currentDir, ".gitko");
+
+    }
+
 
     public override bool ValidateArguments()
     {
@@ -10,25 +18,29 @@ public class InitCommand : Command
             throw new ArgumentException("Init zahteva 0 argumenata");
         return true;
     }
+    
 
+    public void Initialize()
+    {
+        Directory.CreateDirectory(gitkoDir);
+        Directory.CreateDirectory(Path.Combine(gitkoDir, "objects"));
+        Directory.CreateDirectory(Path.Combine(gitkoDir, "refs", "heads"));
+
+        File.WriteAllText(Path.Combine(gitkoDir, "HEAD"), "ref: refs/heads/main");
+        File.WriteAllText(Path.Combine(gitkoDir, "index"), "{}");
+
+    }
     public override void Run()
     {
-        string currentDir = Directory.GetCurrentDirectory();
-        string minigitDir = Path.Combine(currentDir, ".gitko");
-
-        if (Directory.Exists(minigitDir))
+       
+        if (Directory.Exists(gitkoDir))
         {
-            Console.WriteLine("Ponovo inicijalizovan .gitko direktorijum u: " + minigitDir);
+            Initialize();
+            Console.WriteLine("Ponovo inicijalizovan .gitko direktorijum u: " + gitkoDir);
             return;
         }
 
-        Directory.CreateDirectory(minigitDir);
-        Directory.CreateDirectory(Path.Combine(minigitDir, "objects"));
-        Directory.CreateDirectory(Path.Combine(minigitDir, "refs", "heads"));
-
-        File.WriteAllText(Path.Combine(minigitDir, "HEAD"), "ref: refs/heads/main");
-        File.WriteAllText(Path.Combine(minigitDir, "index"), "");
-
-        Console.WriteLine($"Inicijalizovan .gitko direktorijum u: {minigitDir}");
+        Initialize();
+        Console.WriteLine($"Inicijalizovan .gitko direktorijum u: {gitkoDir}");
     }
 }

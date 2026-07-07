@@ -19,11 +19,12 @@ public class AddCommand : Command
     {
         ObjectStore objectStore = new();
         string path = Helper.LocatePath(args[0]);
-        byte[] content = File.ReadAllBytes(path);
 
-        Response resp = objectStore.Store(content);
-        if (resp.Success == false)
-            throw new ArgumentException(resp.Message);
+        if (!Helper.IsInsideRootDirectory(path))
+            throw new ArgumentException("Fajl mora biti unutar gitko repozitorijuma");
+
+        if (!File.Exists(path))
+            throw new FileNotFoundException("Fajl koji želite dodati nepostoji");
 
         string rootPath = Helper.LocateRootDirectory();
         string relativePath = Path.GetRelativePath(rootPath, path);
@@ -31,6 +32,14 @@ public class AddCommand : Command
 
         Index index = new Index();
         index.Load();
+        byte[] content = File.ReadAllBytes(path);
+
+        Response resp = objectStore.Store(content);
+        if (resp.Success == false)
+            throw new ArgumentException(resp.Message);
+
+        if(resp.Data == null)
+            throw new FileNotFoundException("Fajl koji želite dodati nepostoji");
         string d = (string)resp.Data;
         index.Add(relativePath, d);
         index.Save();

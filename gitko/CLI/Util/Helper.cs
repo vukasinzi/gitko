@@ -59,4 +59,21 @@ public static class Helper
         return Path.GetFullPath(combined);
         
     }
+
+    public static bool IsInsideRootDirectory(string path)
+    {
+        string rootPath = Path.GetFullPath(LocateRootDirectory())
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        string fullPath = Path.GetFullPath(path)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        StringComparison comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return string.Equals(fullPath, rootPath, comparison) ||
+               fullPath.StartsWith(rootPath + Path.DirectorySeparatorChar, comparison) ||
+               fullPath.StartsWith(rootPath + Path.AltDirectorySeparatorChar, comparison);
+    }
 }
