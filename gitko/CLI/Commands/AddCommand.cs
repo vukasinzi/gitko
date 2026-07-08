@@ -34,9 +34,7 @@ public class AddCommand : Command
                 AddFile(file, index);
         }
         else
-        {
             AddFile(path, index);
-        }
 
         index.Save();
     }
@@ -51,7 +49,7 @@ public class AddCommand : Command
             return;
         
         byte[] content = File.ReadAllBytes(path);
-        Response resp = objectStore.Store(content);
+        Response resp = objectStore.Store(content,ObjectType.Blob);
 
         if (!resp.Success)
             throw new ArgumentException(resp.Message);
