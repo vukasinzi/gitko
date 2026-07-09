@@ -122,9 +122,14 @@ public class CommitCommand : Command
         if (!resp.Success)
             throw new Exception("Neuspešno komitovanje promena");
 
-        if(WriteToBranch((string)resp.Data))
+        if (WriteToBranch((string)resp.Data))
+        {
             Console.WriteLine($"Uspešno komitovanje. Hash: {resp.Data}");
+        }
+        else
+        {
         throw new Exception("Commit sačuvan, ali HEAD nije ažuriran");
+        }
     }
 
     public bool WriteToBranch(string hash)

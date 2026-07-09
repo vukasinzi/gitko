@@ -49,7 +49,7 @@ public static class Helper
             currentDir = Path.GetDirectoryName(currentDir); 
         }
 
-        throw new Exception("Nemoće naći root direktorijum!");
+        throw new Exception("Ne mogu naći root direktorijum!");
     }
 
     public static string LocatePath(string arg)
