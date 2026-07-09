@@ -58,4 +58,5 @@ public class AddCommand : Command
         index.Add(relativePath, hash);
         Console.WriteLine($"Dodat {relativePath}");
     }
+    
 }
