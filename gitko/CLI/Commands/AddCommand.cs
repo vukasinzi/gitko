@@ -41,13 +41,15 @@ public class AddCommand : Command
 
     private void AddFile(string path, Index index)
     {
+        
         ObjectStore objectStore = new();
         string rootPath = Helper.LocateRootDirectory();
         string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
 
         if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
             return;
-        
+        if (index.Entries.ContainsKey(relativePath))
+            return;
         byte[] content = File.ReadAllBytes(path);
         Response resp = objectStore.Store(content,ObjectType.Blob);
 
@@ -55,6 +57,7 @@ public class AddCommand : Command
             throw new ArgumentException(resp.Message);
 
         string hash = (string)resp.Data;
+        
         index.Add(relativePath, hash);
         Console.WriteLine($"Dodat {relativePath}");
     }

@@ -24,6 +24,9 @@ public static class Parser
             case "add":
                 new AddCommand(arguments).Execute();
                 break;
+            case "commit":
+                new CommitCommand(arguments).Execute();
+                break;
             default:
                 Console.WriteLine("Korišćenje: gitko <komanda> [argumenti]");
                 break;

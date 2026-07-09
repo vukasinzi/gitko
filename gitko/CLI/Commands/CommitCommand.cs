@@ -1,5 +1,7 @@
 using System.Data;
 using System.Reflection.Metadata;
+using System.Text;
+using System.Text.Json;
 using gitko.CLI.Objects;
 using gitko.Models;
 
@@ -74,6 +76,22 @@ public class CommitCommand : Command
         return Path.Combine(root, ".gitko", data);
     }
 
+    private Commit LoadThatCommit(string lastCommitHash)
+    {
+        string part1 = lastCommitHash[0..2];
+        string part2 = lastCommitHash[2..];
+
+        var root = Helper.LocateRootDirectory();
+        var file = Path.Combine(root, ".gitko", "objects", part1, part2);
+
+        byte[] fullBytes = File.ReadAllBytes(file);
+        int nullIndex = Array.IndexOf(fullBytes, (byte)0);
+        byte[] jsonBytes = fullBytes[(nullIndex + 1)..];//micemo header commit /0
+        string json = Encoding.UTF8.GetString(jsonBytes);
+
+        Commit commit = JsonSerializer.Deserialize<Commit>(json);
+        return commit;
+    }
     public override void Run()
     {
         Index index = new Index();
@@ -88,6 +106,12 @@ public class CommitCommand : Command
         }
         else
         {
+            Commit last = LoadThatCommit(lastCommitHash);
+            if (last.Tree == treeHash)
+            {
+                Console.WriteLine("Ne postoje promene za commitovanje");
+                return;
+            }
             commit.Parent = lastCommitHash;
         }
         commit.Tree = treeHash;
@@ -98,10 +122,9 @@ public class CommitCommand : Command
         if (!resp.Success)
             throw new Exception("Neuspešno komitovanje promena");
 
-        WriteToBranch((string)resp.Data);
-        
-        Console.WriteLine($"Uspešno komitovanje. Hash: {resp.Data}");
-
+        if(WriteToBranch((string)resp.Data))
+            Console.WriteLine($"Uspešno komitovanje. Hash: {resp.Data}");
+        throw new Exception("Commit sačuvan, ali HEAD nije ažuriran");
     }
 
     public bool WriteToBranch(string hash)
