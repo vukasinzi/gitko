@@ -54,6 +54,7 @@ public class CheckoutCommand : Command
        //ovde krece checkout
        Tree mainTree = new();
         Commit lastCommit = Helper.LoadThatCommit(lastHash);
+        Helper.WipeOut();
         mainTree.Load(lastCommit.Tree);
         mainTree.Rebuild(Helper.LocateRootDirectory());
         

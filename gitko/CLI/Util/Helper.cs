@@ -114,4 +114,24 @@ public static class Helper
         commit.Hash = lastHash;
         return commit;
     }
+
+    public static void WipeOut()
+    {
+        var root = LocateRootDirectory();
+
+        foreach (string file in Directory.GetFiles(root))
+        {
+            File.Delete(file);
+        }
+
+        foreach (string dir in Directory.GetDirectories(root))
+        {
+            if (Path.GetFileName(dir) == ".gitko")
+                continue;
+            Directory.Delete(dir, true);
+        }
+        
+
+
+    }
 }
