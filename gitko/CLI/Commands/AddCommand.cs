@@ -48,8 +48,6 @@ public class AddCommand : Command
 
         if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
             return;
-        if (index.Entries.ContainsKey(relativePath))
-            return;
         byte[] content = File.ReadAllBytes(path);
         Response resp = objectStore.Store(content,ObjectType.Blob);
 

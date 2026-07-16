@@ -1,9 +1,7 @@
-using System.Data;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using gitko.CLI.Objects;
-using gitko.Models;
 
 namespace gitko.CLI;
 using Index = gitko.CLI.Objects.Index;
@@ -61,91 +59,62 @@ public class CommitCommand : Command
             tree.TreeEntries.Add(new TreeEntry(ObjectType.Tree, folderName, hash));
         }
 
-        Response resp = tree.Save();
-        if (!resp.Success)
-            throw new DataException("Nemoguće sačuvati tree");
-        return (string)resp.Data;
+        tree.Save();
+        return tree.Hash;
     }
-    private string GetBranchPath()
-    {
-        var root = Helper.LocateRootDirectory();
-        string headPath = Path.Combine(root, ".gitko", "HEAD");
-        string data = File.ReadAllText(headPath).Trim();
-        data = data[5..];
+ 
 
-        return Path.Combine(root, ".gitko", data);
-    }
-
-    private Commit LoadThatCommit(string lastCommitHash)
-    {
-        string part1 = lastCommitHash[0..2];
-        string part2 = lastCommitHash[2..];
-
-        var root = Helper.LocateRootDirectory();
-        var file = Path.Combine(root, ".gitko", "objects", part1, part2);
-
-        byte[] fullBytes = File.ReadAllBytes(file);
-        int nullIndex = Array.IndexOf(fullBytes, (byte)0);
-        byte[] jsonBytes = fullBytes[(nullIndex + 1)..];//micemo header commit /0
-        string json = Encoding.UTF8.GetString(jsonBytes);
-
-        Commit commit = JsonSerializer.Deserialize<Commit>(json);
-        return commit;
-    }
+  
     public override void Run()
     {
         Index index = new Index();
         index.Load();
-        
+
         string treeHash = RecursiveTree("", index.Entries);
         Commit commit = new();
-        var (isFirst, lastCommitHash) = isItFirstCommit();
-        if (isFirst)
+
+        string lastHash = Helper.LoadLastCommit();
+  
+        if (string.IsNullOrEmpty(lastHash))
         {
-            commit.Parent = null;
+            commit.Parent = null;                   
         }
         else
         {
-            Commit last = LoadThatCommit(lastCommitHash);
+            Commit last = Helper.LoadThatCommit(lastHash);
+
             if (last.Tree == treeHash)
             {
                 Console.WriteLine("Ne postoje promene za commitovanje");
                 return;
             }
-            commit.Parent = lastCommitHash;
+
+            commit.Parent = last.Hash;                 
         }
+
         commit.Tree = treeHash;
         commit.Message = args[1].Replace("\"", "");
         commit.Timestamp = DateTime.Now;
 
-        Response resp = commit.Save();
-        if (!resp.Success)
-            throw new Exception("Neuspešno komitovanje promena");
-
-        if (WriteToBranch((string)resp.Data))
+        commit.Save();
+  
+        if (WriteToBranch(commit.Hash))
         {
-            Console.WriteLine($"Uspešno komitovanje. Hash: {resp.Data}");
+            Console.WriteLine($"Uspešno komitovanje. Hash: {commit.Hash}");
         }
         else
         {
-        throw new Exception("Commit sačuvan, ali HEAD nije ažuriran");
+            throw new Exception("Commit sačuvan, ali HEAD nije ažuriran");
         }
     }
 
+
     public bool WriteToBranch(string hash)
     {
-        string branchPath = GetBranchPath();
+        string branchPath = Helper.GetBranchPath();
         File.WriteAllText(branchPath, hash);
         return File.ReadAllText(branchPath) == hash;
     }
 
-    private Tuple<bool,string> isItFirstCommit()
-    {
-        string branchPath = GetBranchPath();
-        if (!Path.Exists(branchPath))
-            return new Tuple<bool, string>(true, "");
-
-        var lastCommit = File.ReadAllText(branchPath);
-        return new Tuple<bool, string>(false, lastCommit);
-    }
+   
 }

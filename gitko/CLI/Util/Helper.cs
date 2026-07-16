@@ -1,5 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using gitko.CLI.Objects;
 using Microsoft.Extensions.Configuration;
 
 namespace gitko.CLI;
@@ -75,5 +77,41 @@ public static class Helper
         return string.Equals(fullPath, rootPath, comparison) ||
                fullPath.StartsWith(rootPath + Path.DirectorySeparatorChar, comparison) ||
                fullPath.StartsWith(rootPath + Path.AltDirectorySeparatorChar, comparison);
+    }
+    public static string GetBranchPath()
+    {
+        var root = Helper.LocateRootDirectory();
+        string headPath = Path.Combine(root, ".gitko", "HEAD");
+        string data = File.ReadAllText(headPath).Trim();
+        data = data[5..];
+
+        return Path.Combine(root, ".gitko", data);
+    }
+    public static string LoadLastCommit()
+    {
+        string path = GetBranchPath();
+        if (!File.Exists(path))
+            return null;
+        return File.ReadAllText(path).Trim();
+    }
+
+    public static Commit LoadThatCommit(string lastHash)
+    {
+        string part1 = lastHash[0..2];
+        string part2 = lastHash[2..];
+
+        var root = Helper.LocateRootDirectory();
+        var file = Path.Combine(root, ".gitko", "objects", part1, part2);
+
+        byte[] fullBytes = File.ReadAllBytes(file);
+        int nullIndex = Array.IndexOf(fullBytes, (byte)0);
+        byte[] jsonBytes = fullBytes[(nullIndex + 1)..];//micemo header commit /0
+        string json = Encoding.UTF8.GetString(jsonBytes);
+
+        Commit commit = JsonSerializer.Deserialize<Commit>(json);
+        if(commit == null)
+            throw new NullReferenceException("Poslednji komit nije pronađen");
+        commit.Hash = lastHash;
+        return commit;
     }
 }
