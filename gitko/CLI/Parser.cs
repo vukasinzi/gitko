@@ -27,6 +27,9 @@ public static class Parser
             case "commit":
                 new CommitCommand(arguments).Execute();
                 break;
+            case "log":
+                new LogCommand(arguments).Execute();
+                break;
             default:
                 Console.WriteLine("Korišćenje: gitko <komanda> [argumenti]");
                 break;

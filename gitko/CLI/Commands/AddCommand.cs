@@ -48,6 +48,7 @@ public class AddCommand : Command
 
         if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
             return;
+      
         byte[] content = File.ReadAllBytes(path);
         Response resp = objectStore.Store(content,ObjectType.Blob);
 
@@ -55,7 +56,8 @@ public class AddCommand : Command
             throw new ArgumentException(resp.Message);
 
         string hash = (string)resp.Data;
-        
+        if (index.Entries.TryGetValue(relativePath, out var existingHash) && existingHash == hash)
+            return;
         index.Add(relativePath, hash);
         Console.WriteLine($"Dodat {relativePath}");
     }

@@ -41,4 +41,20 @@ public class Commit
         this.Message = lastCommit.Message;
         
     }
+
+    public void Load(string hash)
+    {
+        Commit lastCommit = Helper.LoadThatCommit(hash);
+        this.Tree = lastCommit.Tree;
+        this.Parent = lastCommit.Parent;
+        this.Author = lastCommit.Author;
+        this.Timestamp = lastCommit.Timestamp;
+        this.Message = lastCommit.Message;
+        this.Hash = hash;
+    }
+
+    public override string ToString()
+    {
+        return $"{Hash}, {Message}, {Author}, {Timestamp.ToString()}";
+    }
 }
