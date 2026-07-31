@@ -2,7 +2,6 @@
 
 A tiny git clone written in C#. Mostly built to actually understand what `git add`/`commit`/`checkout` are doing under the hood instead of just trusting the magic.
 
-Don't expect this to replace real git it's just to init a repo, stage files, commit them, branch off, switch branches, see the log.
 
 ## Requirements
 
@@ -24,6 +23,9 @@ gitko log                     # walk through commit history
 gitko checkout <branch>       # switch to an existing branch
 gitko checkout -b <branch>    # create a new branch and switch to it
 gitko version                 # print current version
+gitko branch                  # shows all branches
+gitko branch   -d <branch>    # deletes the branch
+git reset <commit-hash>       # resets current branch hash to the targeted hash.
 ```
 
 ## How it stores things
