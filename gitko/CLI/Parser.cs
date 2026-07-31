@@ -33,6 +33,9 @@ public static class Parser
             case "checkout":
                 new CheckoutCommand(arguments).Execute();
                 break;
+            case "reset":
+                new ResetCommand(arguments).Execute();
+                break;
             default:
                 Console.WriteLine("Korišćenje: gitko <komanda> [argumenti]");
                 break;

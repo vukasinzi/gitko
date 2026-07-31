@@ -114,7 +114,12 @@ public static class Helper
         commit.Hash = lastHash;
         return commit;
     }
-
+    public static void ClearIndex()                                                                                                                                                                                                   
+    {                                                                                                                                                                                                                                 
+        var root = LocateRootDirectory();                                                                                                                                                                                             
+        string indexPath = Path.Combine(root, ".gitko", "index");                                                                                                                                                                     
+        File.WriteAllText(indexPath, JsonSerializer.Serialize(new Dictionary<string, string>()));                                                                                                                                     
+    }
     public static void WipeOut()
     {
         var root = LocateRootDirectory();
