@@ -25,7 +25,9 @@ gitko checkout -b <branch>    # create a new branch and switch to it
 gitko version                 # print current version
 gitko branch                  # shows all branches
 gitko branch   -d <branch>    # deletes the branch
-git reset <commit-hash>       # resets current branch hash to the targeted hash.
+gitko reset <commit-hash>     # resets current branch hash to the targeted hash.
+gitko author                  # show who commits are attributed to
+gitko author -set <name>      # set the author for this repo
 ```
 
 ## How it stores things

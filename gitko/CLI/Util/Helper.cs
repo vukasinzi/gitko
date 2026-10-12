@@ -87,6 +87,20 @@ public static class Helper
 
         return Path.Combine(root, ".gitko", data);
     }
+    public static string GetAuthorPath()
+    {
+        var root = LocateRootDirectory();
+        return Path.Combine(root, ".gitko", "author");
+    }
+    public static string? LoadAuthor()
+    {
+        string path = GetAuthorPath();
+        if (!File.Exists(path))
+            return null;
+
+        string author = File.ReadAllText(path).Trim();
+        return string.IsNullOrWhiteSpace(author) ? null : author;
+    }
     public static string LoadLastCommit()
     {
         string path = GetBranchPath();

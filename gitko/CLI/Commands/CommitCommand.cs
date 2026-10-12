@@ -96,6 +96,10 @@ public class CommitCommand : Command
         commit.Message = args[1].Replace("\"", "");
         commit.Timestamp = DateTime.Now;
 
+        string? author = Helper.LoadAuthor();
+        if (author != null)
+            commit.Author = author;
+
         commit.Save();
   
         if (WriteToBranch(commit.Hash))
