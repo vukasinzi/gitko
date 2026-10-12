@@ -158,8 +158,9 @@ public static class Helper
             File.Delete(fullPath);
 
         string root = LocateRootDirectory();
+        string currentDir = Directory.GetCurrentDirectory();
         string? dir = Path.GetDirectoryName(fullPath);
-        while (dir != null && dir != root && Directory.Exists(dir)
+        while (dir != null && dir != root && dir != currentDir && Directory.Exists(dir)
                && !Directory.EnumerateFileSystemEntries(dir).Any())
         {
             Directory.Delete(dir);
