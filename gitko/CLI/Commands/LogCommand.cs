@@ -2,7 +2,7 @@ using gitko.CLI.Objects;
 
 namespace gitko.CLI;
 
-public class LogCommand :Command
+public class LogCommand : Command
 {
     public LogCommand(string[] args) : base(args)
     {
@@ -10,26 +10,28 @@ public class LogCommand :Command
 
     public override bool ValidateArguments()
     {
-        if (args.Length == 0)
-            return true;
-        return false;
+        return args.Length == 0;
     }
 
     public override void Run()
     {
-        string lastHash = Helper.LoadLastCommit();
+        string? lastHash = Helper.LoadLastCommit();
         if (string.IsNullOrEmpty(lastHash))
         {
             Console.WriteLine("Root direktorijum nema komitove.");
             return;
         }
-        do
+
+        PrintHistory(lastHash);
+    }
+
+    private void PrintHistory(string? hash)
+    {
+        while (!string.IsNullOrEmpty(hash))
         {
-            Commit c = new Commit();
-            c.Load(lastHash);
-            Console.WriteLine(c.ToString());
-            lastHash = c.Parent;
-            
-        }while(!string.IsNullOrEmpty(lastHash));
+            Commit commit = Helper.LoadThatCommit(hash);
+            Console.WriteLine(commit);
+            hash = commit.Parent;
+        }
     }
 }
