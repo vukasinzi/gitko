@@ -38,7 +38,7 @@ public class AuthorCommand : Command
     {
         name = name.Trim();
         if (string.IsNullOrWhiteSpace(name))
-            throw new ApplicationException("Ime autora ne može biti prazno.");
+            throw new GitkoException("Ime autora ne može biti prazno.");
 
         File.WriteAllText(Helper.GetAuthorPath(), name);
         Console.WriteLine("Autor postavljen -> " + name);

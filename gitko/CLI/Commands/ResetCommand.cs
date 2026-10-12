@@ -17,13 +17,12 @@ public class ResetCommand : Command
 
     public override void Run()
     {
-   
-        
         Commit commit = Helper.LoadThatCommit(args[0]);
+        
         if (string.IsNullOrWhiteSpace(commit.Tree))
-            throw new ArgumentException("Komit nije pronađen");
+            throw new GitkoException("Komit nije pronađen");
+        
         Helper.RestoreTree(commit.Tree);
-
         string branchPath = Helper.GetBranchPath();
         File.WriteAllText(branchPath, commit.Hash);//promenjen hash u branchu
      

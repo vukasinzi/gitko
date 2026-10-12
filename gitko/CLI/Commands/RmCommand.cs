@@ -27,7 +27,7 @@ public class RmCommand : Command
         string path = Helper.LocatePath(args.First(a => !a.StartsWith("-")));
 
         if (!Helper.IsInsideRootDirectory(path))
-            throw new ArgumentException("Fajl mora biti unutar gitko repozitorijuma");
+            throw new GitkoException("Fajl mora biti unutar gitko repozitorijuma");
 
         string rootPath = Helper.LocateRootDirectory();
         string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
@@ -37,10 +37,10 @@ public class RmCommand : Command
 
         List<string> matches = index.PathsUnder(relativePath);
         if (matches.Count == 0)
-            throw new ApplicationException("Fajl nije praćen: " + relativePath);
+            throw new GitkoException("Fajl nije praćen: " + relativePath);
 
         if (!recursive && !index.Entries.ContainsKey(relativePath))
-            throw new ApplicationException($"{relativePath} je folder. Za brisanje foldera koristi -r.");
+            throw new GitkoException($"{relativePath} je folder. Za brisanje foldera koristi -r.");
 
         foreach (string entry in matches)
         {

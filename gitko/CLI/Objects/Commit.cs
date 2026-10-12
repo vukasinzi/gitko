@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using gitko.Models;
 
 namespace gitko.CLI.Objects;
 
@@ -22,12 +21,7 @@ public class Commit
         byte[] data = Encoding.UTF8.GetBytes(json);
 
         ObjectStore os = new();
-        Response resp = os.Store(data, ObjectType.Commit);
-
-        if (!resp.Success)
-            throw new Exception(resp.Message);
-
-        Hash = (string)resp.Data;
+        Hash = os.Store(data, ObjectType.Commit);
     }
 
     public void Load()

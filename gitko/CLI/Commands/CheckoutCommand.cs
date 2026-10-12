@@ -30,7 +30,7 @@ public class CheckoutCommand : Command
     {
         string refPath = BranchRefPath(name);
         if (File.Exists(refPath))
-            throw new ApplicationException("Grana već postoji. Nemoguće je kreirati je");
+            throw new GitkoException("Grana već postoji. Nemoguće je kreirati je");
 
         File.WriteAllText(refPath, Helper.LoadLastCommit());
         Console.WriteLine("Uspešno kreirana grana.");
@@ -42,7 +42,7 @@ public class CheckoutCommand : Command
     {
         string refPath = BranchRefPath(name);
         if (!File.Exists(refPath))
-            throw new ApplicationException("Grana ne postoji.");
+            throw new GitkoException("Grana ne postoji.");
 
         bool alreadyOnBranch = name == Path.GetFileName(Helper.GetBranchPath());
         if (alreadyOnBranch)
@@ -58,7 +58,7 @@ public class CheckoutCommand : Command
     private void RestoreWorkingDirectory(string commitHash)
     {
         if (string.IsNullOrEmpty(commitHash))
-            return; // grana još nema komitova
+            return; // grana jos nema komitova
 
         Commit commit = Helper.LoadThatCommit(commitHash);
         Helper.RestoreTree(commit.Tree);

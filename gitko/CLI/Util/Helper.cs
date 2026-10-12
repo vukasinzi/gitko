@@ -53,7 +53,7 @@ public static class Helper
             currentDir = Path.GetDirectoryName(currentDir); 
         }
 
-        throw new Exception("Ne mogu naći root direktorijum!");
+        throw new GitkoException("Ne mogu naći root direktorijum!");
     }
 
     public static string LocatePath(string arg)
@@ -92,7 +92,7 @@ public static class Helper
     public static void ValidateBranchName(string name)
     {
         if (!Regex.IsMatch(name, @"^[\p{L}\p{N}_][\p{L}\p{N}._-]*$"))
-            throw new ApplicationException("Neispravno ime grane: " + name);
+            throw new GitkoException("Neispravno ime grane: " + name);
     }
     public static string GetAuthorPath()
     {
@@ -123,6 +123,8 @@ public static class Helper
 
         var root = Helper.LocateRootDirectory();
         var file = Path.Combine(root, ".gitko", "objects", part1, part2);
+        if (!File.Exists(file))
+            throw new GitkoException("Komit nije pronađen: " + lastHash);
 
         byte[] fullBytes = File.ReadAllBytes(file);
         int nullIndex = Array.IndexOf(fullBytes, (byte)0);

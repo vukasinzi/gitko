@@ -1,5 +1,4 @@
 using gitko.CLI.Objects;
-using gitko.Models;
 using Index = gitko.CLI.Objects.Index;
 
 namespace gitko.CLI;
@@ -11,7 +10,7 @@ public class AddCommand : Command
     public override bool ValidateArguments()
     {
         if (args.Length != 1)
-            throw new ArgumentException("Dodaj zahteva tačno 1 argument");
+            throw new GitkoException("Add zahteva tačno 1 argument");
         return true;
     }
 
@@ -20,7 +19,7 @@ public class AddCommand : Command
         string path = Helper.LocatePath(args[0]);
 
         if (!Helper.IsInsideRootDirectory(path))
-            throw new ArgumentException("Fajl mora biti unutar gitko repozitorijuma");
+            throw new GitkoException("Fajl mora biti unutar gitko repozitorijuma");
 
         Index index = new Index();
         index.Load();
@@ -35,7 +34,7 @@ public class AddCommand : Command
         else if (File.Exists(path))
             AddFile(path, index);
         else if (removed == 0)
-            throw new DirectoryNotFoundException("Direktorijum/Fajl koji želite dodati ne postoji");
+            throw new GitkoException("Direktorijum/Fajl koji želite dodati ne postoji");
 
         index.Save();
     }
@@ -68,12 +67,7 @@ public class AddCommand : Command
             return;
       
         byte[] content = File.ReadAllBytes(path);
-        Response resp = objectStore.Store(content,ObjectType.Blob);
-
-        if (!resp.Success)
-            throw new ArgumentException(resp.Message);
-
-        string hash = (string)resp.Data;
+        string hash = objectStore.Store(content,ObjectType.Blob);
         if (index.Entries.TryGetValue(relativePath, out var existingHash) && existingHash == hash)
             return;
         index.Add(relativePath, hash);

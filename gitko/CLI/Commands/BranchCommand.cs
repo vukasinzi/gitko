@@ -50,10 +50,10 @@ public class BranchCommand : Command
         string path = Path.Combine(headsDir, name);
 
         if (!File.Exists(path))
-            throw new ApplicationException("Grana ne postoji.");
+            throw new GitkoException("Grana ne postoji.");
 
         if (name == Path.GetFileName(Helper.GetBranchPath()))
-            throw new ApplicationException("Nemoguće je obrisati trenutno aktivnu granu.");
+            throw new GitkoException("Nemoguće je obrisati trenutno aktivnu granu.");
 
         File.Delete(path);
         Console.WriteLine("Obrisana grana -> " + name);

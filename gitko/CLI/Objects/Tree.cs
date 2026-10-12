@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using gitko.Models;
 
 namespace gitko.CLI.Objects;
 
@@ -18,12 +17,7 @@ public class Tree
         byte[] data = Encoding.UTF8.GetBytes(json);
 
         ObjectStore os = new();
-        Response resp = os.Store(data, ObjectType.Tree);
-
-        if (!resp.Success)
-            throw new Exception(resp.Message);
-
-        Hash = (string)resp.Data;
+        Hash = os.Store(data, ObjectType.Tree);
     }
 
     public void Rebuild(string targetDirectory)

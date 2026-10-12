@@ -1,3 +1,5 @@
+using gitko.CLI;
+
 public abstract class Command
 {
     public string[] args { get; }
@@ -15,9 +17,15 @@ public abstract class Command
                 return;
             Run();
         }
-        catch (Exception x)
+        catch (GitkoException x)      // očekivano: korisnik je pogrešio
         {
             Console.WriteLine(x.Message);
+            Environment.ExitCode = 1;
+        }
+        catch (Exception x)           // neočekivano: bag ili problem sa diskom
+        {
+            Console.WriteLine("Neočekivana greška: " + x.Message);
+            Environment.ExitCode = 1;
         }
     }
 
