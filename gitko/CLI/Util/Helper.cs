@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using gitko.CLI.Objects;
+using Index = gitko.CLI.Objects.Index;
 using Microsoft.Extensions.Configuration;
 
 namespace gitko.CLI;
@@ -87,6 +89,11 @@ public static class Helper
 
         return Path.Combine(root, ".gitko", data);
     }
+    public static void ValidateBranchName(string name)
+    {
+        if (!Regex.IsMatch(name, @"^[\p{L}\p{N}_][\p{L}\p{N}._-]*$"))
+            throw new ApplicationException("Neispravno ime grane: " + name);
+    }
     public static string GetAuthorPath()
     {
         var root = LocateRootDirectory();
@@ -128,29 +135,35 @@ public static class Helper
         commit.Hash = lastHash;
         return commit;
     }
-    public static void ClearIndex()                                                                                                                                                                                                   
-    {                                                                                                                                                                                                                                 
-        var root = LocateRootDirectory();                                                                                                                                                                                             
-        string indexPath = Path.Combine(root, ".gitko", "index");                                                                                                                                                                     
-        File.WriteAllText(indexPath, JsonSerializer.Serialize(new Dictionary<string, string>()));                                                                                                                                     
-    }
-    public static void WipeOut()
+    public static void RestoreTree(string treeHash)
     {
-        var root = LocateRootDirectory();
+        string root = LocateRootDirectory();
 
-        foreach (string file in Directory.GetFiles(root))
+        Tree tree = new();
+        tree.Load(treeHash);
+
+        Index index = new Index();
+        index.Load();
+        foreach (string path in index.Entries.Keys)
+            DeleteFile(Path.Combine(root, path));
+
+        tree.Rebuild(root);
+
+        index.LoadFromTree(treeHash);
+        index.Save();
+    }
+    public static void DeleteFile(string fullPath)
+    {
+        if (File.Exists(fullPath))
+            File.Delete(fullPath);
+
+        string root = LocateRootDirectory();
+        string? dir = Path.GetDirectoryName(fullPath);
+        while (dir != null && dir != root && Directory.Exists(dir)
+               && !Directory.EnumerateFileSystemEntries(dir).Any())
         {
-            File.Delete(file);
+            Directory.Delete(dir);
+            dir = Path.GetDirectoryName(dir);
         }
-
-        foreach (string dir in Directory.GetDirectories(root))
-        {
-            if (Path.GetFileName(dir) == ".gitko")
-                continue;
-            Directory.Delete(dir, true);
-        }
-        
-
-
     }
 }

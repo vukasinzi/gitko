@@ -20,43 +20,52 @@ public class CheckoutCommand : Command
 
     }
 
-    private void HandleArgs(string name,string branch)
-    {
-        if (!File.Exists(branch) && args[0] == "-b")
-        {
-            string currentHash = Helper.LoadLastCommit();
-            File.WriteAllText(branch, currentHash);
-            Console.WriteLine("Uspešno kreirana grana.");
-        }
-        else if (!File.Exists(branch) && args[0] != "-b")
-        {
-            throw new ApplicationException("Grana ne postoji.");
-        }
-        else if(File.Exists(branch) && args[0] == "-b")
-        {
-            throw new ApplicationException("Grana već postoji. Nemoguće je kreirati je");
-        }
-        
-        string head = Path.Combine(Helper.LocateRootDirectory(), ".gitko", "HEAD");
-        File.WriteAllText(head,"ref: refs/heads/"+name);
-       
-        Console.WriteLine("Trenutna aktivna grana -> " + name);
-    }
     public override void Run()
     {
-         string name = args.Length == 2 ? args[1] : args[0];
-        string branch = Path.Combine(Helper.LocateRootDirectory(), ".gitko", "refs","heads",name);
-       HandleArgs(name,branch);
-       string lastHash = File.ReadAllText(branch);
-       if (string.IsNullOrEmpty(lastHash))
-           return;
-       
-       //ovde krece checkout
-       Tree mainTree = new();
-        Commit lastCommit = Helper.LoadThatCommit(lastHash);
-        Helper.WipeOut();
-        mainTree.Load(lastCommit.Tree);
-        mainTree.Rebuild(Helper.LocateRootDirectory());
-        
+        string name = args.Length == 2 ? args[1] : args[0];
+        Helper.ValidateBranchName(name);
+        string branch = Path.Combine(Helper.LocateRootDirectory(), ".gitko", "refs", "heads", name);
+
+        if (args[0] == "-b")
+        {
+            CreateBranch(branch);
+            WriteHead(name);
+            return;
+        }
+
+        if (!File.Exists(branch))
+            throw new ApplicationException("Grana ne postoji.");
+
+        if (name == Path.GetFileName(Helper.GetBranchPath()))
+        {
+            Console.WriteLine("Grana je već aktivna -> " + name);
+            return;
+        }
+
+        //ovde krece checkout
+        string lastHash = File.ReadAllText(branch);
+        if (!string.IsNullOrEmpty(lastHash))
+        {
+            Commit lastCommit = Helper.LoadThatCommit(lastHash);
+            Helper.RestoreTree(lastCommit.Tree);
+        }
+
+        WriteHead(name);
+    }
+
+    private void CreateBranch(string branch)
+    {
+        if (File.Exists(branch))
+            throw new ApplicationException("Grana već postoji. Nemoguće je kreirati je");
+
+        File.WriteAllText(branch, Helper.LoadLastCommit());
+        Console.WriteLine("Uspešno kreirana grana.");
+    }
+
+    private void WriteHead(string name)
+    {
+        string head = Path.Combine(Helper.LocateRootDirectory(), ".gitko", "HEAD");
+        File.WriteAllText(head, "ref: refs/heads/" + name);
+        Console.WriteLine("Trenutna aktivna grana -> " + name);
     }
 }

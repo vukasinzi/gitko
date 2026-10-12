@@ -35,6 +35,7 @@ public class InitCommand : Command
        
         if (Directory.Exists(gitkoDir))
         {
+            Directory.Delete(gitkoDir, true);
             Initialize();
             Console.WriteLine("Ponovo inicijalizovan .gitko direktorijum u: " + gitkoDir);
             return;

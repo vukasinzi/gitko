@@ -42,6 +42,9 @@ public static class Parser
             case "author":
                 new AuthorCommand(arguments).Execute();
                 break;
+            case "rm":
+                new RmCommand(arguments).Execute();
+                break;
             default:
                 Console.WriteLine("Korišćenje: gitko <komanda> [argumenti]");
                 break;

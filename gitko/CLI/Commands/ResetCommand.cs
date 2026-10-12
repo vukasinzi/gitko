@@ -19,15 +19,11 @@ public class ResetCommand : Command
     {
    
         
-        Tree mainTree = new();
         Commit commit = Helper.LoadThatCommit(args[0]);
         if (string.IsNullOrWhiteSpace(commit.Tree))
             throw new ArgumentException("Komit nije pronađen");
-        Helper.WipeOut();
-        mainTree.Load(commit.Tree);
-        mainTree.Rebuild(Helper.LocateRootDirectory());
-        
-        Helper.ClearIndex();
+        Helper.RestoreTree(commit.Tree);
+
         string branchPath = Helper.GetBranchPath();
         File.WriteAllText(branchPath, commit.Hash);//promenjen hash u branchu
      

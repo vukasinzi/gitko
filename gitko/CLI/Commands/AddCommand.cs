@@ -22,21 +22,39 @@ public class AddCommand : Command
         if (!Helper.IsInsideRootDirectory(path))
             throw new ArgumentException("Fajl mora biti unutar gitko repozitorijuma");
 
-        if (!Path.Exists(path))
-            throw new DirectoryNotFoundException("Direktorijum/Fajl koji želite dodati ne postoji");
-
         Index index = new Index();
         index.Load();
+
+        int removed = RemoveDeleted(path, index);
 
         if (Directory.Exists(path))
         {
             foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
                 AddFile(file, index);
         }
-        else
+        else if (File.Exists(path))
             AddFile(path, index);
+        else if (removed == 0)
+            throw new DirectoryNotFoundException("Direktorijum/Fajl koji želite dodati ne postoji");
 
         index.Save();
+    }
+
+    private int RemoveDeleted(string path, Index index)
+    {
+        string rootPath = Helper.LocateRootDirectory();
+        string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
+
+        List<string> missing = index.PathsUnder(relativePath)
+            .Where(key => !File.Exists(Path.Combine(rootPath, key)))
+            .ToList();
+
+        foreach (string key in missing)
+        {
+            index.Remove(key);
+            Console.WriteLine($"Obrisan {key}");
+        }
+        return missing.Count;
     }
 
     private void AddFile(string path, Index index)

@@ -46,6 +46,7 @@ public class BranchCommand : Command
 
     private void DeleteBranch(string name, string headsDir)
     {
+        Helper.ValidateBranchName(name);
         string path = Path.Combine(headsDir, name);
 
         if (!File.Exists(path))

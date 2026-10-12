@@ -59,6 +59,10 @@ public class CommitCommand : Command
             tree.TreeEntries.Add(new TreeEntry(ObjectType.Tree, folderName, hash));
         }
 
+        tree.TreeEntries = tree.TreeEntries
+            .OrderBy(e => e.Name, StringComparer.Ordinal)
+            .ToList();
+
         tree.Save();
         return tree.Hash;
     }
@@ -70,11 +74,16 @@ public class CommitCommand : Command
         Index index = new Index();
         index.Load();
 
+        string lastHash = Helper.LoadLastCommit();
+        if (string.IsNullOrEmpty(lastHash) && index.IsEmpty())
+        {
+            Console.WriteLine("Ne postoje promene za commitovanje");
+            return;
+        }
+
         string treeHash = RecursiveTree("", index.Entries);
         Commit commit = new();
 
-        string lastHash = Helper.LoadLastCommit();
-  
         if (string.IsNullOrEmpty(lastHash))
         {
             commit.Parent = null;                   

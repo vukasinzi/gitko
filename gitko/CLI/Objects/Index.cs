@@ -26,9 +26,34 @@ public class Index
         Entries = JsonSerializer.Deserialize<Dictionary<string,string>>(json) ?? new();
     }
 
+    public void LoadFromTree(string treeHash)
+    {
+        Tree tree = new();
+        tree.Load(treeHash);
+        Entries = new();
+        tree.Flatten("", Entries);
+    }
+
     public void Add(string path, string hash)
     {
         Entries[path] = hash;
+    }
+
+    public void Remove(string path)
+    {
+        Entries.Remove(path);
+    }
+
+    public bool IsEmpty()
+    {
+        return Entries.Count == 0;
+    }
+
+    public List<string> PathsUnder(string relativePath)
+    {
+        return Entries.Keys
+            .Where(key => relativePath == "." || key == relativePath || key.StartsWith(relativePath + "/"))
+            .ToList();
     }
 
   

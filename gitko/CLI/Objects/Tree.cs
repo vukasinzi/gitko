@@ -75,6 +75,25 @@ public class Tree
         Hash = hash;
     }
 
+    public void Flatten(string prefix, Dictionary<string, string> entries)
+    {
+        foreach (TreeEntry entry in TreeEntries)
+        {
+            string path = prefix == "" ? entry.Name : prefix + "/" + entry.Name;
+
+            if (entry.Type == ObjectType.Blob)
+            {
+                entries[path] = entry.Hash;
+            }
+            else if (entry.Type == ObjectType.Tree)
+            {
+                Tree sub = new();
+                sub.Load(entry.Hash);
+                sub.Flatten(path, entries);
+            }
+        }
+    }
+
 
  
 

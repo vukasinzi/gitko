@@ -17,7 +17,10 @@ dotnet build
 
 ```
 gitko init                   # set up a .gitko folder here
-gitko add <path>              # stage a file, or a whole folder recursively
+gitko add <path>              # stage a file, or a whole folder recursively (also stages deleted files)
+gitko rm <path>               # stop tracking a file and delete it
+gitko rm -r <folder>          # same, for a whole folder
+gitko rm --cached <path>      # stop tracking, but keep the file on disk
 gitko commit -m "message"     # commit whatever's staged
 gitko log                     # walk through commit history
 gitko checkout <branch>       # switch to an existing branch
