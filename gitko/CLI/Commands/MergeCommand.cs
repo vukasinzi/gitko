@@ -1,3 +1,5 @@
+using gitko.CLI.Objects;
+
 namespace gitko.CLI;
 
 public class MergeCommand : Command
@@ -25,30 +27,48 @@ public class MergeCommand : Command
             throw new GitkoException("Trenutna grana nema komitove.");
         string otherHash = LoadBranchHash(otherBranchName);
         
-        if (IsBranchUpToDate(currentHash, otherHash))
+        if (IsCurrentBranchUpToDateWith(currentHash, otherHash))
             throw new GitkoException($"Grana je već ažurna: sadrži sve komitove sa grane {otherBranchName}.");
+
+        if (IsOtherBranchUpToDateWith(currentHash, otherHash))
+        {
+            FastForward(otherHash);
+            return;
+        }
+
+        ThreeWayMerge(currentHash,otherHash);
+
+    }
+
+    private void ThreeWayMerge(string currentHash, string otherHash)
+    {
         
     }
 
-    // Da li se poslednji komit naše grane nalazi u istoriji druge grane (npr. features),
-    // tj. da li je main grana menjana ili ne, dok je features menjana.
-    // Primer: main: A, features: A <- B
-
-    private bool IsFastForward(string currentHash, string otherHash)
+    private void FastForward(string otherHash)
     {
-        string hash = currentHash;
-        
+        Commit commit = Helper.LoadThatCommit(otherHash);
+        Helper.RestoreTree(commit.Tree);
+        File.WriteAllText(Helper.GetBranchPath(), otherHash);
+        Console.WriteLine($"Fast-forward: Grana {args[0]} je mergeovana u trenutnu granu");
+
+    }
+
+    // Fast forward moze kad main nije menjan, a features je menjan, i features mergeujem u main.
+    // Primer: main: A, features: A <- B
+    private bool IsOtherBranchUpToDateWith(string currentHash, string otherHash)
+    {
+        string hash = otherHash;
         while (!string.IsNullOrEmpty(hash))
         {
-            if (hash == otherHash)
+            if (hash == currentHash)
                 return true;
             hash = Helper.LoadThatCommit(hash).Parent;
         }
-
         return false;
     }
 
-    private bool IsBranchUpToDate(string currentHash, string otherHash)
+    private bool IsCurrentBranchUpToDateWith(string currentHash, string otherHash)
     {
         string hash = currentHash;
         while (!string.IsNullOrEmpty(hash))
