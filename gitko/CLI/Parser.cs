@@ -45,6 +45,9 @@ public static class Parser
             case "rm":
                 new RmCommand(arguments).Execute();
                 break;
+            case "merge":
+                new MergeCommand(arguments).Execute();
+                break;
             default:
                 Console.WriteLine("Korišćenje: gitko <komanda> [argumenti]");
                 break;

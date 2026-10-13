@@ -14,7 +14,10 @@ public abstract class Command
         try
         {
             if (!ValidateArguments())
+            {
+                Environment.ExitCode = 1;
                 return;
+            }
             Run();
         }
         catch (GitkoException x)      // očekivano: korisnik je pogrešio

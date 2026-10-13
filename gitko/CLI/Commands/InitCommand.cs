@@ -14,9 +14,11 @@ public class InitCommand : Command
 
     public override bool ValidateArguments()
     {
-        if (args.Length != 0)
-            throw new GitkoException("Init zahteva 0 argumenata");
-        return true;
+        if (args.Length == 0)
+            return true;
+
+        Console.WriteLine("Init zahteva 0 argumenata");
+        return false;
     }
     
 

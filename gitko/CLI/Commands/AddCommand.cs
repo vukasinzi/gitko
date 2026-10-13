@@ -9,9 +9,11 @@ public class AddCommand : Command
 
     public override bool ValidateArguments()
     {
-        if (args.Length != 1)
-            throw new GitkoException("Add zahteva tačno 1 argument");
-        return true;
+        if (args.Length == 1)
+            return true;
+
+        Console.WriteLine("Add zahteva tačno 1 argument");
+        return false;
     }
 
     public override void Run()
