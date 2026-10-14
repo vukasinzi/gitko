@@ -16,7 +16,7 @@ public static class Parser
             case "help":
                 break;
             case "version":
-                Console.WriteLine("Trenutna verzija gitka je "+ Helper.LoadConfig()["Version"]?.ToString());
+                Console.WriteLine("Trenutna verzija gitka je "+ Config.Version());
                 break;
             case "init":
                 new InitCommand(arguments).Execute();

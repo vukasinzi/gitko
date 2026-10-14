@@ -13,16 +13,16 @@ public class MergeCommand : Command
         if (args.Length == 1)
             return true;
 
-        Console.WriteLine("Korišćenje: gitko merge <grana>");
+        Console.Error.WriteLine("Korišćenje: gitko merge <grana>");
         return false;
     }
 
     public override void Run()
     {
         string otherBranchName = args[0];
-        Helper.ValidateBranchName(otherBranchName);
+        Refs.ValidateName(otherBranchName);
 
-        string currentHash = Helper.LoadLastCommit();
+        string currentHash = Refs.CurrentCommit();
         if (string.IsNullOrEmpty(currentHash))
             throw new GitkoException("Trenutna grana nema komitove.");
         string otherHash = LoadBranchHash(otherBranchName);
@@ -47,9 +47,9 @@ public class MergeCommand : Command
 
     private void FastForward(string otherHash)
     {
-        Commit commit = Helper.LoadThatCommit(otherHash);
-        Helper.RestoreTree(commit.Tree);
-        File.WriteAllText(Helper.GetBranchPath(), otherHash);
+        Commit commit = Commit.Load(otherHash);
+        WorkingDirectory.Restore(commit.Tree);
+        File.WriteAllText(Refs.CurrentBranchPath(), otherHash);
         Console.WriteLine($"Fast-forward: Grana {args[0]} je mergeovana u trenutnu granu");
 
     }
@@ -63,7 +63,7 @@ public class MergeCommand : Command
         {
             if (hash == currentHash)
                 return true;
-            hash = Helper.LoadThatCommit(hash).Parent;
+            hash = Commit.Load(hash).Parent;
         }
         return false;
     }
@@ -75,14 +75,14 @@ public class MergeCommand : Command
         {
             if (hash == otherHash)
                 return true;
-            hash = Helper.LoadThatCommit(hash).Parent;
+            hash = Commit.Load(hash).Parent;
         }
         return false;
     }
 
     private string LoadBranchHash(string name)
     {
-        string path = Path.Combine(Helper.LocateRootDirectory(), ".gitko", "refs", "heads", name);
+        string path = Path.Combine(Repository.HeadsDir, name);
         if (!File.Exists(path))
             throw new GitkoException("Grana ne postoji.");
 

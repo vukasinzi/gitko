@@ -12,15 +12,15 @@ public class AddCommand : Command
         if (args.Length == 1)
             return true;
 
-        Console.WriteLine("Add zahteva tačno 1 argument");
+        Console.Error.WriteLine("Korišćenje: gitko add <putanja>");
         return false;
     }
 
     public override void Run()
     {
-        string path = Helper.LocatePath(args[0]);
+        string path = Repository.FullPath(args[0]);
 
-        if (!Helper.IsInsideRootDirectory(path))
+        if (!Repository.Contains(path))
             throw new GitkoException("Fajl mora biti unutar gitko repozitorijuma");
 
         Index index = new Index();
@@ -43,8 +43,8 @@ public class AddCommand : Command
 
     private int RemoveDeleted(string path, Index index)
     {
-        string rootPath = Helper.LocateRootDirectory();
-        string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
+        string rootPath = Repository.Root;
+        string relativePath = Repository.RelativePath(path);
 
         List<string> missing = index.PathsUnder(relativePath)
             .Where(key => !File.Exists(Path.Combine(rootPath, key)))
@@ -62,8 +62,7 @@ public class AddCommand : Command
     {
         
         ObjectStore objectStore = new();
-        string rootPath = Helper.LocateRootDirectory();
-        string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
+        string relativePath = Repository.RelativePath(path);
 
         if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
             return;

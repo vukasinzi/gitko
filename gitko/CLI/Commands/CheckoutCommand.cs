@@ -10,7 +10,13 @@ public class CheckoutCommand : Command
 
     public override bool ValidateArguments()
     {
-        return args.Length == 1 || (args.Length == 2 && args[0] == "-b");
+        if (args.Length == 1 && args[0] != "-b")
+            return true;
+        if (args.Length == 2 && args[0] == "-b")
+            return true;
+
+        Console.Error.WriteLine("Korišćenje: gitko checkout [-b] <grana>");
+        return false;
     }
 
     public override void Run()
@@ -18,7 +24,7 @@ public class CheckoutCommand : Command
         string name = args[^1];
         bool createNew = args[0] == "-b";
 
-        Helper.ValidateBranchName(name);
+        Refs.ValidateName(name);
 
         if (createNew)
             CreateBranch(name);
@@ -32,7 +38,7 @@ public class CheckoutCommand : Command
         if (File.Exists(refPath))
             throw new GitkoException("Grana već postoji. Nemoguće je kreirati je");
 
-        File.WriteAllText(refPath, Helper.LoadLastCommit());
+        File.WriteAllText(refPath, Refs.CurrentCommit());
         Console.WriteLine("Uspešno kreirana grana.");
 
         PointHeadAt(name);
@@ -44,7 +50,7 @@ public class CheckoutCommand : Command
         if (!File.Exists(refPath))
             throw new GitkoException("Grana ne postoji.");
 
-        bool alreadyOnBranch = name == Path.GetFileName(Helper.GetBranchPath());
+        bool alreadyOnBranch = name == Refs.CurrentBranchName();
         if (alreadyOnBranch)
         {
             Console.WriteLine("Grana je već aktivna -> " + name);
@@ -60,19 +66,19 @@ public class CheckoutCommand : Command
         if (string.IsNullOrEmpty(commitHash))
             return; // grana jos nema komitova
 
-        Commit commit = Helper.LoadThatCommit(commitHash);
-        Helper.RestoreTree(commit.Tree);
+        Commit commit = Commit.Load(commitHash);
+        WorkingDirectory.Restore(commit.Tree);
     }
 
     private void PointHeadAt(string name)
     {
-        string headPath = Path.Combine(Helper.LocateRootDirectory(), ".gitko", "HEAD");
+        string headPath = Repository.HeadPath;
         File.WriteAllText(headPath, "ref: refs/heads/" + name);
         Console.WriteLine("Trenutna aktivna grana -> " + name);
     }
 
     private string BranchRefPath(string name)
     {
-        return Path.Combine(Helper.LocateRootDirectory(), ".gitko", "refs", "heads", name);
+        return Path.Combine(Repository.HeadsDir, name);
     }
 }

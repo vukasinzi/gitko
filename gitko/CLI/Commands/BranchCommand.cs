@@ -12,13 +12,14 @@ public class BranchCommand : Command
             return true;
         if (args.Length == 2 && args[0] == "-d")
             return true;
+
+        Console.Error.WriteLine("Korišćenje: gitko branch [-d <grana>]");
         return false;
     }
 
     public override void Run()
     {
-        string root = Helper.LocateRootDirectory();
-        string headsDir = Path.Combine(root, ".gitko", "refs", "heads");
+        string headsDir = Repository.HeadsDir;
 
         if (args.Length == 2 && args[0] == "-d")
         {
@@ -34,7 +35,7 @@ public class BranchCommand : Command
         if (!Directory.Exists(headsDir))
             return;
 
-        string current = Path.GetFileName(Helper.GetBranchPath());
+        string current = Refs.CurrentBranchName();
 
         foreach (string file in Directory.GetFiles(headsDir))
         {
@@ -46,13 +47,13 @@ public class BranchCommand : Command
 
     private void DeleteBranch(string name, string headsDir)
     {
-        Helper.ValidateBranchName(name);
+        Refs.ValidateName(name);
         string path = Path.Combine(headsDir, name);
 
         if (!File.Exists(path))
             throw new GitkoException("Grana ne postoji.");
 
-        if (name == Path.GetFileName(Helper.GetBranchPath()))
+        if (name == Refs.CurrentBranchName())
             throw new GitkoException("Nemoguće je obrisati trenutno aktivnu granu.");
 
         File.Delete(path);

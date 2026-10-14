@@ -22,12 +22,12 @@ public abstract class Command
         }
         catch (GitkoException x)      // očekivano: korisnik je pogrešio
         {
-            Console.WriteLine(x.Message);
+            Console.Error.WriteLine(x.Message);
             Environment.ExitCode = 1;
         }
         catch (Exception x)           // neočekivano: bag ili problem sa diskom
         {
-            Console.WriteLine("Neočekivana greška: " + x.Message);
+            Console.Error.WriteLine("Neočekivana greška: " + x.Message);
             Environment.ExitCode = 1;
         }
     }

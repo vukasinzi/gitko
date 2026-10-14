@@ -13,7 +13,7 @@ public class AuthorCommand : Command
         if (args.Length >= 2 && args[0] == "-set")
             return true;
 
-        Console.WriteLine("Korišćenje: gitko author [-set <ime>]");
+        Console.Error.WriteLine("Korišćenje: gitko author [-set <ime>]");
         return false;
     }
 
@@ -30,7 +30,7 @@ public class AuthorCommand : Command
 
     private void ShowAuthor()
     {
-        string? author = Helper.LoadAuthor();
+        string? author = Config.LoadAuthor();
         Console.WriteLine(author ?? "Autor nije podešen (Nepoznat)");
     }
 
@@ -40,7 +40,7 @@ public class AuthorCommand : Command
         if (string.IsNullOrWhiteSpace(name))
             throw new GitkoException("Ime autora ne može biti prazno.");
 
-        File.WriteAllText(Helper.GetAuthorPath(), name);
+        File.WriteAllText(Config.AuthorPath, name);
         Console.WriteLine("Autor postavljen -> " + name);
     }
 }

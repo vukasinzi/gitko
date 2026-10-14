@@ -16,11 +16,11 @@ public class CommitCommand : Command
 
     public override bool ValidateArguments()
     {
-        if (args.Length != 2)
-            return false;
-        if (args[0] != "-m")
-            return false;
-        return true;
+        if (args.Length == 2 && args[0] == "-m")
+            return true;
+
+        Console.Error.WriteLine("Korišćenje: gitko commit -m <poruka>");
+        return false;
     }
 
     private string RecursiveTree(string dir, Dictionary<string,string> entries)
@@ -74,7 +74,7 @@ public class CommitCommand : Command
         Index index = new Index();
         index.Load();
 
-        string lastHash = Helper.LoadLastCommit();
+        string lastHash = Refs.CurrentCommit();
         if (string.IsNullOrEmpty(lastHash) && index.IsEmpty())
         {
             Console.WriteLine("Ne postoje promene za commitovanje");
@@ -90,7 +90,7 @@ public class CommitCommand : Command
         }
         else
         {
-            Commit last = Helper.LoadThatCommit(lastHash);
+            Commit last = Commit.Load(lastHash);
 
             if (last.Tree == treeHash)
             {
@@ -105,7 +105,7 @@ public class CommitCommand : Command
         commit.Message = args[1].Replace("\"", "");
         commit.Timestamp = DateTime.Now;
 
-        string? author = Helper.LoadAuthor();
+        string? author = Config.LoadAuthor();
         if (author != null)
             commit.Author = author;
 
@@ -124,7 +124,7 @@ public class CommitCommand : Command
 
     public bool WriteToBranch(string hash)
     {
-        string branchPath = Helper.GetBranchPath();
+        string branchPath = Refs.CurrentBranchPath();
         File.WriteAllText(branchPath, hash);
         return File.ReadAllText(branchPath) == hash;
     }

@@ -24,27 +24,17 @@ public class Commit
         Hash = os.Store(data, ObjectType.Commit);
     }
 
-    public void Load()
+    public static Commit Load(string hash)
     {
-        string lastHash = Helper.LoadLastCommit();
-        Commit lastCommit = Helper.LoadThatCommit(lastHash);
-        this.Tree = lastCommit.Tree;
-        this.Parent = lastCommit.Parent;
-        this.Author = lastCommit.Author;
-        this.Timestamp = lastCommit.Timestamp;
-        this.Message = lastCommit.Message;
-        
-    }
+        ObjectStore os = new();
+        byte[] content = os.Read(hash, ObjectType.Commit);
+        string json = Encoding.UTF8.GetString(content);
 
-    public void Load(string hash)
-    {
-        Commit lastCommit = Helper.LoadThatCommit(hash);
-        this.Tree = lastCommit.Tree;
-        this.Parent = lastCommit.Parent;
-        this.Author = lastCommit.Author;
-        this.Timestamp = lastCommit.Timestamp;
-        this.Message = lastCommit.Message;
-        this.Hash = hash;
+        Commit commit = JsonSerializer.Deserialize<Commit>(json);
+        if (commit == null)
+            throw new GitkoException("Poslednji komit nije pronađen");
+        commit.Hash = hash;
+        return commit;
     }
 
     public override string ToString()

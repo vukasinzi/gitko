@@ -8,15 +8,13 @@ public class Index
 
     public void Save()
     {
-        var root = Helper.LocateRootDirectory();
         var json = JsonSerializer.Serialize(Entries);
-        File.WriteAllText(Path.Combine(root, ".gitko", "index"), json);
+        File.WriteAllText(Repository.IndexPath, json);
     }
 
     public void Load()
     {
-        var root = Helper.LocateRootDirectory();
-        var path = Path.Combine(root, ".gitko", "index");
+        var path = Repository.IndexPath;
         if (!File.Exists(path))
         {
             Entries = new();

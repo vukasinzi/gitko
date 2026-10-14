@@ -26,11 +26,8 @@ public class Tree
         {
             if (treeEntry.Type == ObjectType.Blob)
             {
-                byte[] fullBytes = File.ReadAllBytes(Path.Combine(Helper.LocateRootDirectory(), ".gitko", "objects",
-                    treeEntry.Hash[0..2], treeEntry.Hash[2..]));
-                
-                int nullIndex = Array.IndexOf(fullBytes, (byte)0);
-                byte[] content = fullBytes[(nullIndex + 1)..];
+                ObjectStore os = new();
+                byte[] content = os.Read(treeEntry.Hash, ObjectType.Blob);
 
                 File.WriteAllBytes(Path.Combine(targetDirectory, treeEntry.Name), content);
                 
@@ -50,20 +47,13 @@ public class Tree
     }
     public void Load(string hash)
     {
-        string part1 = hash[0..2];
-        string part2 = hash[2..];
-
-        string root = Helper.LocateRootDirectory();
-        string file = Path.Combine(root, ".gitko", "objects", part1, part2);
-
-        byte[] fullBytes = File.ReadAllBytes(file);
-        int nullIndex = Array.IndexOf(fullBytes, (byte)0);
-        byte[] jsonBytes = fullBytes[(nullIndex + 1)..];
-        string json = Encoding.UTF8.GetString(jsonBytes);
+        ObjectStore os = new();
+        byte[] content = os.Read(hash, ObjectType.Tree);
+        string json = Encoding.UTF8.GetString(content);
 
         List<TreeEntry> entries = JsonSerializer.Deserialize<List<TreeEntry>>(json);
         if (entries == null)
-            throw new NullReferenceException("Tree nije pronađen");
+            throw new GitkoException("Tree nije pronađen");
 
         TreeEntries = entries;
         Hash = hash;

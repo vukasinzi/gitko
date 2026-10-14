@@ -17,7 +17,7 @@ public class InitCommand : Command
         if (args.Length == 0)
             return true;
 
-        Console.WriteLine("Init zahteva 0 argumenata");
+        Console.Error.WriteLine("Korišćenje: gitko init");
         return false;
     }
     

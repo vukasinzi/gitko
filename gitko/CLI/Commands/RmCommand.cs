@@ -10,13 +10,20 @@ public class RmCommand : Command
 
     public override bool ValidateArguments()
     {
-        string[] flags = args.Where(a => a.StartsWith("-")).ToArray();
-        string[] paths = args.Where(a => !a.StartsWith("-")).ToArray();
+        int pathCount = 0;
+        bool unknownFlag = false;
+        foreach (string arg in args)
+        {
+            if (!arg.StartsWith("-"))
+                pathCount++;
+            else if (!Flags.Contains(arg))
+                unknownFlag = true;
+        }
 
-        if (paths.Length == 1 && flags.All(f => Flags.Contains(f)))
+        if (pathCount == 1 && !unknownFlag)
             return true;
 
-        Console.WriteLine("Korišćenje: gitko rm [-r] [--cached] <putanja>");
+        Console.Error.WriteLine("Korišćenje: gitko rm [-r] [--cached] <putanja>");
         return false;
     }
 
@@ -24,13 +31,13 @@ public class RmCommand : Command
     {
         bool recursive = args.Contains("-r");
         bool cached = args.Contains("--cached");
-        string path = Helper.LocatePath(args.First(a => !a.StartsWith("-")));
+        string path = Repository.FullPath(args.First(a => !a.StartsWith("-")));
 
-        if (!Helper.IsInsideRootDirectory(path))
+        if (!Repository.Contains(path))
             throw new GitkoException("Fajl mora biti unutar gitko repozitorijuma");
 
-        string rootPath = Helper.LocateRootDirectory();
-        string relativePath = Path.GetRelativePath(rootPath, path).Replace("\\", "/");
+        string rootPath = Repository.Root;
+        string relativePath = Repository.RelativePath(path);
 
         Index index = new Index();
         index.Load();
@@ -52,7 +59,7 @@ public class RmCommand : Command
                 continue;
             }
 
-            Helper.DeleteFile(Path.Combine(rootPath, entry));
+            WorkingDirectory.DeleteFile(Path.Combine(rootPath, entry));
             Console.WriteLine($"Uklonjen {entry}");
         }
 

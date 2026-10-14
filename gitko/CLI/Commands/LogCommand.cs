@@ -10,12 +10,16 @@ public class LogCommand : Command
 
     public override bool ValidateArguments()
     {
-        return args.Length == 0;
+        if (args.Length == 0)
+            return true;
+
+        Console.Error.WriteLine("Korišćenje: gitko log");
+        return false;
     }
 
     public override void Run()
     {
-        string? lastHash = Helper.LoadLastCommit();
+        string? lastHash = Refs.CurrentCommit();
         if (string.IsNullOrEmpty(lastHash))
         {
             Console.WriteLine("Root direktorijum nema komitove.");
@@ -29,7 +33,7 @@ public class LogCommand : Command
     {
         while (!string.IsNullOrEmpty(hash))
         {
-            Commit commit = Helper.LoadThatCommit(hash);
+            Commit commit = Commit.Load(hash);
             Console.WriteLine(commit);
             hash = commit.Parent;
         }
