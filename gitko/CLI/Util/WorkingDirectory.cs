@@ -23,6 +23,18 @@ public static class WorkingDirectory
         index.Save();
     }
 
+    public static void WriteFile(string relativePath, string blobHash)
+    {
+        ObjectStore os = new();
+        byte[] content = os.Read(blobHash, ObjectType.Blob);
+
+        string fullPath = Path.Combine(Repository.Root, relativePath);
+        string? dir = Path.GetDirectoryName(fullPath);
+        if (dir != null)
+            Directory.CreateDirectory(dir);
+        File.WriteAllBytes(fullPath, content);
+    }
+
     public static void DeleteFile(string fullPath)
     {
         if (File.Exists(fullPath))
