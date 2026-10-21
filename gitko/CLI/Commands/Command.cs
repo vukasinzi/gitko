@@ -18,6 +18,8 @@ public abstract class Command
                 Environment.ExitCode = 1;
                 return;
             }
+            if (NeedsKey)
+                RepoKey.Unlock();
             Run();
         }
         catch (GitkoException x)      // očekivano: korisnik je pogrešio
@@ -33,6 +35,8 @@ public abstract class Command
     }
 
     public abstract void Run();
+
+    public virtual bool NeedsKey => false;
 
     public virtual bool ValidateArguments()
     {

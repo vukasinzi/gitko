@@ -4,6 +4,8 @@ namespace gitko.CLI;
 
 public class CheckoutCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public CheckoutCommand(string[] args) : base(args)
     {
     }

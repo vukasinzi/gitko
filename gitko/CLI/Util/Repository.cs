@@ -39,6 +39,16 @@ public static class Repository
         get { return Path.Combine(GitkoDir, "refs", "heads"); }
     }
 
+    public static string SaltPath
+    {
+        get { return Path.Combine(GitkoDir, "salt"); }
+    }
+
+    public static string KeyCheckPath
+    {
+        get { return Path.Combine(GitkoDir, "keycheck"); }
+    }
+
     public static string FullPath(string arg)
     {
         string combined = Path.Combine(Directory.GetCurrentDirectory(), arg);

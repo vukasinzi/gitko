@@ -4,6 +4,8 @@ namespace gitko.CLI;
 
 public class ResetCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public ResetCommand(string[] args) : base(args)
     {
     }

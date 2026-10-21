@@ -4,6 +4,8 @@ namespace gitko.CLI;
 
 public class LogCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public LogCommand(string[] args) : base(args)
     {
     }

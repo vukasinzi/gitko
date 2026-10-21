@@ -5,6 +5,8 @@ namespace gitko.CLI;
 
 public class MergeCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public MergeCommand(string[] args) : base(args)
     {
     }

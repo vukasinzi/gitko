@@ -5,6 +5,8 @@ namespace gitko.CLI;
 
 public class AddCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public AddCommand(string[] args) : base(args) { }
 
     public override bool ValidateArguments()
@@ -64,7 +66,7 @@ public class AddCommand : Command
         ObjectStore objectStore = new();
         string relativePath = Repository.RelativePath(path);
 
-        if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
+        if (relativePath.Split('/').Contains(".gitko"))
             return;
       
         byte[] content = File.ReadAllBytes(path);

@@ -9,6 +9,8 @@ using Index = gitko.CLI.Objects.Index;
 
 public class CommitCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public CommitCommand(string[] args) : base(args)
     {
         

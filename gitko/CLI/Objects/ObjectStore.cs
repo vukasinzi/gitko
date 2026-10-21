@@ -5,7 +5,9 @@ namespace gitko.CLI.Objects;
 
 public class ObjectStore
 {
-   
+   private const int NonceSize = 12;
+   private const int TagSize = 16;
+
    public string Store(byte[] data,ObjectType type)
    {
       byte[] header = Encoding.UTF8.GetBytes($"{type.ToString().ToLower()}\0");
@@ -20,7 +22,7 @@ public class ObjectStore
       
       string filePath = Path.Combine(folderPath, fileName);
       
-      File.WriteAllBytes(filePath, full);
+      File.WriteAllBytes(filePath, Encrypt(full, hashed));
 
       return hashed;
    }
@@ -34,7 +36,7 @@ public class ObjectStore
       if (!File.Exists(filePath))
          throw new GitkoException("Objekat nije pronađen: " + hash);
 
-      byte[] full = File.ReadAllBytes(filePath);
+      byte[] full = Decrypt(File.ReadAllBytes(filePath), hash);
       int nullIndex = Array.IndexOf(full, (byte)0);
       string header = Encoding.UTF8.GetString(full, 0, nullIndex);
       string expected = type.ToString().ToLower();
@@ -46,9 +48,42 @@ public class ObjectStore
 
    private static string Hash(byte[] input)
    {
-      using var sha = SHA256.Create();
-      byte[] hashBytes = sha.ComputeHash(input);
+      byte[] hashBytes = HMACSHA256.HashData(RepoKey.NameKey!, input);
       return ToHexString(hashBytes);
+   }
+
+   private static byte[] Encrypt(byte[] plain, string hash)
+   {
+      byte[] nonce = RandomNumberGenerator.GetBytes(NonceSize);
+      byte[] tag = new byte[TagSize];
+      byte[] cipher = new byte[plain.Length];
+
+      using var aes = new AesGcm(RepoKey.EncKey!, TagSize);
+      aes.Encrypt(nonce, plain, cipher, tag, Encoding.UTF8.GetBytes(hash));
+
+      return nonce.Concat(tag).Concat(cipher).ToArray();
+   }
+
+   private static byte[] Decrypt(byte[] stored, string hash)
+   {
+      if (stored.Length < NonceSize + TagSize)
+         throw new GitkoException("Objekat je oštećen: " + hash);
+
+      byte[] nonce = stored[..NonceSize];
+      byte[] tag = stored[NonceSize..(NonceSize + TagSize)];
+      byte[] cipher = stored[(NonceSize + TagSize)..];
+      byte[] plain = new byte[cipher.Length];
+
+      using var aes = new AesGcm(RepoKey.EncKey!, TagSize);
+      try
+      {
+         aes.Decrypt(nonce, cipher, tag, plain, Encoding.UTF8.GetBytes(hash));
+      }
+      catch (AuthenticationTagMismatchException)
+      {
+         throw new GitkoException("Objekat je oštećen: " + hash);
+      }
+      return plain;
    }
 
    private static string ToHexString(byte[] bytes)
