@@ -1,7 +1,7 @@
-using gitko.CLI.Objects;
-using Index = gitko.CLI.Objects.Index;
+using snap.CLI.Objects;
+using Index = snap.CLI.Objects.Index;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public static class WorkingDirectory
 {

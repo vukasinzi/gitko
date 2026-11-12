@@ -1,6 +1,6 @@
-using gitko.CLI.Objects;
+using snap.CLI.Objects;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class LogCommand : Command
 {
@@ -15,7 +15,7 @@ public class LogCommand : Command
         if (args.Length == 0)
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko log");
+        Console.Error.WriteLine("Korišćenje: snap log");
         return false;
     }
 

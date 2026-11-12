@@ -1,4 +1,4 @@
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class AuthorCommand : Command
 {
@@ -13,7 +13,7 @@ public class AuthorCommand : Command
         if (args.Length >= 2 && args[0] == "-set")
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko author [-set <ime>]");
+        Console.Error.WriteLine("Korišćenje: snap author [-set <ime>]");
         return false;
     }
 
@@ -38,7 +38,7 @@ public class AuthorCommand : Command
     {
         name = name.Trim();
         if (string.IsNullOrWhiteSpace(name))
-            throw new GitkoException("Ime autora ne može biti prazno.");
+            throw new SnapException("Ime autora ne može biti prazno.");
 
         File.WriteAllText(Config.AuthorPath, name);
         Console.WriteLine("Autor postavljen -> " + name);

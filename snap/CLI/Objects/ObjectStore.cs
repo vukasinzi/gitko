@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace gitko.CLI.Objects;
+namespace snap.CLI.Objects;
 
 public class ObjectStore
 {
@@ -30,18 +30,18 @@ public class ObjectStore
    public byte[] Read(string hash, ObjectType type)
    {
       if (hash.Length != 64)
-         throw new GitkoException("Neispravan hash: " + hash);
+         throw new SnapException("Neispravan hash: " + hash);
 
       string filePath = Path.Combine(Repository.ObjectsDir, hash[0..2], hash[2..]);
       if (!File.Exists(filePath))
-         throw new GitkoException("Objekat nije pronađen: " + hash);
+         throw new SnapException("Objekat nije pronađen: " + hash);
 
       byte[] full = Decrypt(File.ReadAllBytes(filePath), hash);
       int nullIndex = Array.IndexOf(full, (byte)0);
       string header = Encoding.UTF8.GetString(full, 0, nullIndex);
       string expected = type.ToString().ToLower();
       if (header != expected)
-         throw new GitkoException($"{hash} nije {expected}, nego {header}.");
+         throw new SnapException($"{hash} nije {expected}, nego {header}.");
 
       return full[(nullIndex + 1)..];
    }
@@ -67,7 +67,7 @@ public class ObjectStore
    private static byte[] Decrypt(byte[] stored, string hash)
    {
       if (stored.Length < NonceSize + TagSize)
-         throw new GitkoException("Objekat je oštećen: " + hash);
+         throw new SnapException("Objekat je oštećen: " + hash);
 
       byte[] nonce = stored[..NonceSize];
       byte[] tag = stored[NonceSize..(NonceSize + TagSize)];
@@ -81,7 +81,7 @@ public class ObjectStore
       }
       catch (AuthenticationTagMismatchException)
       {
-         throw new GitkoException("Objekat je oštećen: " + hash);
+         throw new SnapException("Objekat je oštećen: " + hash);
       }
       return plain;
    }

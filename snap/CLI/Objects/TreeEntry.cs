@@ -1,4 +1,4 @@
-namespace gitko.CLI.Objects;
+namespace snap.CLI.Objects;
 
 public class TreeEntry
 {

@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace gitko.CLI.Objects;
+namespace snap.CLI.Objects;
 using System.Linq;
 public class Index
 {

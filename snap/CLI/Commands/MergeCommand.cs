@@ -1,7 +1,7 @@
-using gitko.CLI.Objects;
-using Index = gitko.CLI.Objects.Index;
+using snap.CLI.Objects;
+using Index = snap.CLI.Objects.Index;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class MergeCommand : Command
 {
@@ -16,7 +16,7 @@ public class MergeCommand : Command
         if (args.Length == 1)
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko merge <grana>");
+        Console.Error.WriteLine("Korišćenje: snap merge <grana>");
         return false;
     }
 
@@ -27,11 +27,11 @@ public class MergeCommand : Command
 
         string currentHash = Refs.CurrentCommit();
         if (string.IsNullOrEmpty(currentHash))
-            throw new GitkoException("Trenutna grana nema komitove.");
+            throw new SnapException("Trenutna grana nema komitove.");
         string otherHash = LoadBranchHash(otherBranchName);
         
         if (IsCurrentBranchUpToDateWith(currentHash, otherHash))
-            throw new GitkoException($"Grana je već ažurna: sadrži sve komitove sa grane {otherBranchName}.");
+            throw new SnapException($"Grana je već ažurna: sadrži sve komitove sa grane {otherBranchName}.");
 
         if (IsOtherBranchUpToDateWith(currentHash, otherHash))
         {
@@ -55,7 +55,7 @@ public class MergeCommand : Command
         Dictionary<string, string> merged = MergeFiles(commonFiles, currentFiles, otherFiles, conflicts);
 
         if (conflicts.Count > 0)
-            throw new GitkoException("Konflikt u fajlovima: " + string.Join(", ", conflicts));
+            throw new SnapException("Konflikt u fajlovima: " + string.Join(", ", conflicts));
 
         UpdateWorkingDirectory(currentFiles, merged);
 
@@ -85,7 +85,7 @@ public class MergeCommand : Command
             hash = Commit.Load(hash).Parent;
         }
 
-        throw new GitkoException("Grane nemaju zajedničkog pretka.");
+        throw new SnapException("Grane nemaju zajedničkog pretka.");
     }
 
     private Dictionary<string, string> FilesOf(string commitHash)
@@ -193,11 +193,11 @@ public class MergeCommand : Command
     {
         string path = Path.Combine(Repository.HeadsDir, name);
         if (!File.Exists(path))
-            throw new GitkoException("Grana ne postoji.");
+            throw new SnapException("Grana ne postoji.");
 
         string hash = File.ReadAllText(path).Trim();
         if (string.IsNullOrEmpty(hash))
-            throw new GitkoException($"Grana {name} nema komitove.");
+            throw new SnapException($"Grana {name} nema komitove.");
         return hash;
     }
 }

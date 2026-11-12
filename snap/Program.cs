@@ -1,6 +1,6 @@
-﻿using gitko.CLI;
+﻿using snap.CLI;
 
-namespace gitko;
+namespace snap;
 
 public class Program
 {

@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public static class RepoKey
 {
@@ -14,11 +14,11 @@ public static class RepoKey
     {
         string password = ReadPassword("Lozinka: ");
         if (password == "")
-            throw new GitkoException("Lozinka ne može biti prazna.");
+            throw new SnapException("Lozinka ne može biti prazna.");
 
         string repeated = ReadPassword("Ponovi lozinku: ");
         if (password != repeated)
-            throw new GitkoException("Lozinke se ne poklapaju.");
+            throw new SnapException("Lozinke se ne poklapaju.");
 
         return password;
     }
@@ -35,7 +35,7 @@ public static class RepoKey
     public static void Unlock()
     {
         if (!File.Exists(Repository.SaltPath) || !File.Exists(Repository.KeyCheckPath))
-            throw new GitkoException("Repozitorijum nema lozinku. Pokreni gitko init.");
+            throw new SnapException("Repozitorijum nema lozinku. Pokreni snap init.");
 
         string password = ReadPassword("Lozinka: ");
         byte[] salt = File.ReadAllBytes(Repository.SaltPath);
@@ -43,10 +43,10 @@ public static class RepoKey
 
         byte[] expected = File.ReadAllBytes(Repository.KeyCheckPath);
         if (!CryptographicOperations.FixedTimeEquals(KeyCheck(key), expected))
-            throw new GitkoException("Pogrešna lozinka.");
+            throw new SnapException("Pogrešna lozinka.");
 
-        NameKey = HKDF.Expand(HashAlgorithmName.SHA256, key, 32, Encoding.UTF8.GetBytes("gitko-name"));
-        EncKey = HKDF.Expand(HashAlgorithmName.SHA256, key, 32, Encoding.UTF8.GetBytes("gitko-enc"));
+        NameKey = HKDF.Expand(HashAlgorithmName.SHA256, key, 32, Encoding.UTF8.GetBytes("snap-name"));
+        EncKey = HKDF.Expand(HashAlgorithmName.SHA256, key, 32, Encoding.UTF8.GetBytes("snap-enc"));
     }
 
     private static byte[] Derive(string password, byte[] salt)
@@ -56,7 +56,7 @@ public static class RepoKey
 
     private static byte[] KeyCheck(byte[] key)
     {
-        return HMACSHA256.HashData(key, Encoding.UTF8.GetBytes("gitko"));
+        return HMACSHA256.HashData(key, Encoding.UTF8.GetBytes("snap"));
     }
 
     private static string ReadPassword(string prompt)

@@ -1,4 +1,4 @@
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public static class Parser
 {
@@ -20,7 +20,7 @@ public static class Parser
                 PrintHelp();
                 break;
             case "version":
-                Console.WriteLine("Trenutna verzija gitka je "+ Config.Version());
+                Console.WriteLine("Trenutna verzija snap-a je "+ Config.Version());
                 break;
             case "init":
                 new InitCommand(arguments).Execute();
@@ -53,7 +53,7 @@ public static class Parser
                 new MergeCommand(arguments).Execute();
                 break;
             default:
-                Console.Error.WriteLine($"Nepoznata komanda: {command}. Pokreni gitko help.");
+                Console.Error.WriteLine($"Nepoznata komanda: {command}. Pokreni snap help.");
                 Environment.ExitCode = 1;
                 break;
         }
@@ -62,7 +62,7 @@ public static class Parser
     private static void PrintHelp()
     {
         Console.WriteLine("""
-            Korišćenje: gitko <komanda> [argumenti]
+            Korišćenje: snap <komanda> [argumenti]
 
               init                     napravi novi repozitorijum
               add <putanja>            dodaj fajl ili folder u index
