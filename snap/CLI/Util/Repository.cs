@@ -1,4 +1,4 @@
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public static class Repository
 {
@@ -14,29 +14,39 @@ public static class Repository
         }
     }
 
-    public static string GitkoDir
+    public static string SnapDir
     {
-        get { return Path.Combine(Root, ".gitko"); }
+        get { return Path.Combine(Root, ".snap"); }
     }
 
     public static string ObjectsDir
     {
-        get { return Path.Combine(GitkoDir, "objects"); }
+        get { return Path.Combine(SnapDir, "objects"); }
     }
 
     public static string IndexPath
     {
-        get { return Path.Combine(GitkoDir, "index"); }
+        get { return Path.Combine(SnapDir, "index"); }
     }
 
     public static string HeadPath
     {
-        get { return Path.Combine(GitkoDir, "HEAD"); }
+        get { return Path.Combine(SnapDir, "HEAD"); }
     }
 
     public static string HeadsDir
     {
-        get { return Path.Combine(GitkoDir, "refs", "heads"); }
+        get { return Path.Combine(SnapDir, "refs", "heads"); }
+    }
+
+    public static string SaltPath
+    {
+        get { return Path.Combine(SnapDir, "salt"); }
+    }
+
+    public static string KeyCheckPath
+    {
+        get { return Path.Combine(SnapDir, "keycheck"); }
     }
 
     public static string FullPath(string arg)
@@ -73,12 +83,12 @@ public static class Repository
 
         while (currentDir != null)
         {
-            if (Directory.Exists(Path.Combine(currentDir, ".gitko")))
+            if (Directory.Exists(Path.Combine(currentDir, ".snap")))
                 return currentDir;
 
             currentDir = Path.GetDirectoryName(currentDir);
         }
 
-        throw new GitkoException("Ne mogu naći root direktorijum!");
+        throw new SnapException("Ne mogu naći root direktorijum!");
     }
 }

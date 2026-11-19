@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace gitko.CLI.Objects;
+namespace snap.CLI.Objects;
 
 public class Tree
 {
@@ -53,7 +53,7 @@ public class Tree
 
         List<TreeEntry> entries = JsonSerializer.Deserialize<List<TreeEntry>>(json);
         if (entries == null)
-            throw new GitkoException("Tree nije pronađen");
+            throw new SnapException("Tree nije pronađen");
 
         TreeEntries = entries;
         Hash = hash;

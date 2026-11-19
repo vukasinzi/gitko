@@ -1,4 +1,4 @@
-using gitko.CLI;
+using snap.CLI;
 
 public abstract class Command
 {
@@ -18,9 +18,11 @@ public abstract class Command
                 Environment.ExitCode = 1;
                 return;
             }
+            if (NeedsKey)
+                RepoKey.Unlock();
             Run();
         }
-        catch (GitkoException x)      // očekivano: korisnik je pogrešio
+        catch (SnapException x)      // očekivano: korisnik je pogrešio
         {
             Console.Error.WriteLine(x.Message);
             Environment.ExitCode = 1;
@@ -33,6 +35,8 @@ public abstract class Command
     }
 
     public abstract void Run();
+
+    public virtual bool NeedsKey => false;
 
     public virtual bool ValidateArguments()
     {

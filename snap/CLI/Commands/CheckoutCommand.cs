@@ -1,9 +1,11 @@
-using gitko.CLI.Objects;
+using snap.CLI.Objects;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class CheckoutCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public CheckoutCommand(string[] args) : base(args)
     {
     }
@@ -15,7 +17,7 @@ public class CheckoutCommand : Command
         if (args.Length == 2 && args[0] == "-b")
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko checkout [-b] <grana>");
+        Console.Error.WriteLine("Korišćenje: snap checkout [-b] <grana>");
         return false;
     }
 
@@ -36,7 +38,7 @@ public class CheckoutCommand : Command
     {
         string refPath = BranchRefPath(name);
         if (File.Exists(refPath))
-            throw new GitkoException("Grana već postoji. Nemoguće je kreirati je");
+            throw new SnapException("Grana već postoji. Nemoguće je kreirati je");
 
         File.WriteAllText(refPath, Refs.CurrentCommit());
         Console.WriteLine("Uspešno kreirana grana.");
@@ -48,7 +50,7 @@ public class CheckoutCommand : Command
     {
         string refPath = BranchRefPath(name);
         if (!File.Exists(refPath))
-            throw new GitkoException("Grana ne postoji.");
+            throw new SnapException("Grana ne postoji.");
 
         bool alreadyOnBranch = name == Refs.CurrentBranchName();
         if (alreadyOnBranch)

@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace gitko.CLI.Objects;
+namespace snap.CLI.Objects;
 
 public class Commit
 {
@@ -32,7 +32,7 @@ public class Commit
 
         Commit commit = JsonSerializer.Deserialize<Commit>(json);
         if (commit == null)
-            throw new GitkoException("Poslednji komit nije pronađen");
+            throw new SnapException("Poslednji komit nije pronađen");
         commit.Hash = hash;
         return commit;
     }

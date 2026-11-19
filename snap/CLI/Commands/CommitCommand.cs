@@ -1,14 +1,16 @@
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
-using gitko.CLI.Objects;
+using snap.CLI.Objects;
 
-namespace gitko.CLI;
-using Index = gitko.CLI.Objects.Index;
+namespace snap.CLI;
+using Index = snap.CLI.Objects.Index;
 
 
 public class CommitCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public CommitCommand(string[] args) : base(args)
     {
         
@@ -19,7 +21,7 @@ public class CommitCommand : Command
         if (args.Length == 2 && args[0] == "-m")
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko commit -m <poruka>");
+        Console.Error.WriteLine("Korišćenje: snap commit -m <poruka>");
         return false;
     }
 

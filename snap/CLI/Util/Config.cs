@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Configuration;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public static class Config
 {
     public static string AuthorPath
     {
-        get { return Path.Combine(Repository.GitkoDir, "author"); }
+        get { return Path.Combine(Repository.SnapDir, "author"); }
     }
 
     public static string? Version()

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gitko", "gitko\gitko.csproj", "{00AAE3C0-ED0E-46F2-B1EE-10F981E521AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "snap", "snap\snap.csproj", "{00AAE3C0-ED0E-46F2-B1EE-10F981E521AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

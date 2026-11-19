@@ -38,5 +38,5 @@ artifacts/
 .env
 .env.*
 
-.gitko
+.snap
 howitworks.md

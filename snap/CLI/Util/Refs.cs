@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public static class Refs
 {
@@ -8,7 +8,7 @@ public static class Refs
     {
         string head = File.ReadAllText(Repository.HeadPath).Trim();
         string refPath = head[5..];
-        return Path.Combine(Repository.GitkoDir, refPath);
+        return Path.Combine(Repository.SnapDir, refPath);
     }
 
     public static string CurrentBranchName()
@@ -27,6 +27,6 @@ public static class Refs
     public static void ValidateName(string name)
     {
         if (!Regex.IsMatch(name, @"^[\p{L}\p{N}_][\p{L}\p{N}._-]*$"))
-            throw new GitkoException("Neispravno ime grane: " + name);
+            throw new SnapException("Neispravno ime grane: " + name);
     }
 }

@@ -1,10 +1,12 @@
-using gitko.CLI.Objects;
-using Index = gitko.CLI.Objects.Index;
+using snap.CLI.Objects;
+using Index = snap.CLI.Objects.Index;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class AddCommand : Command
 {
+    public override bool NeedsKey => true;
+
     public AddCommand(string[] args) : base(args) { }
 
     public override bool ValidateArguments()
@@ -12,7 +14,7 @@ public class AddCommand : Command
         if (args.Length == 1)
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko add <putanja>");
+        Console.Error.WriteLine("Korišćenje: snap add <putanja>");
         return false;
     }
 
@@ -21,7 +23,7 @@ public class AddCommand : Command
         string path = Repository.FullPath(args[0]);
 
         if (!Repository.Contains(path))
-            throw new GitkoException("Fajl mora biti unutar gitko repozitorijuma");
+            throw new SnapException("Fajl mora biti unutar snap repozitorijuma");
 
         Index index = new Index();
         index.Load();
@@ -36,7 +38,7 @@ public class AddCommand : Command
         else if (File.Exists(path))
             AddFile(path, index);
         else if (removed == 0)
-            throw new GitkoException("Direktorijum/Fajl koji želite dodati ne postoji");
+            throw new SnapException("Direktorijum/Fajl koji želite dodati ne postoji");
 
         index.Save();
     }
@@ -64,7 +66,7 @@ public class AddCommand : Command
         ObjectStore objectStore = new();
         string relativePath = Repository.RelativePath(path);
 
-        if (relativePath == ".gitko" || relativePath.StartsWith(".gitko/"))
+        if (relativePath.Split('/').Contains(".snap"))
             return;
       
         byte[] content = File.ReadAllBytes(path);

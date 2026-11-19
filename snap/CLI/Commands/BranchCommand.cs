@@ -1,4 +1,4 @@
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class BranchCommand : Command
 {
@@ -13,7 +13,7 @@ public class BranchCommand : Command
         if (args.Length == 2 && args[0] == "-d")
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko branch [-d <grana>]");
+        Console.Error.WriteLine("Korišćenje: snap branch [-d <grana>]");
         return false;
     }
 
@@ -51,10 +51,10 @@ public class BranchCommand : Command
         string path = Path.Combine(headsDir, name);
 
         if (!File.Exists(path))
-            throw new GitkoException("Grana ne postoji.");
+            throw new SnapException("Grana ne postoji.");
 
         if (name == Refs.CurrentBranchName())
-            throw new GitkoException("Nemoguće je obrisati trenutno aktivnu granu.");
+            throw new SnapException("Nemoguće je obrisati trenutno aktivnu granu.");
 
         File.Delete(path);
         Console.WriteLine("Obrisana grana -> " + name);

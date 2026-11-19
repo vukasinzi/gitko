@@ -1,6 +1,6 @@
-using Index = gitko.CLI.Objects.Index;
+using Index = snap.CLI.Objects.Index;
 
-namespace gitko.CLI;
+namespace snap.CLI;
 
 public class RmCommand : Command
 {
@@ -23,7 +23,7 @@ public class RmCommand : Command
         if (pathCount == 1 && !unknownFlag)
             return true;
 
-        Console.Error.WriteLine("Korišćenje: gitko rm [-r] [--cached] <putanja>");
+        Console.Error.WriteLine("Korišćenje: snap rm [-r] [--cached] <putanja>");
         return false;
     }
 
@@ -34,7 +34,7 @@ public class RmCommand : Command
         string path = Repository.FullPath(args.First(a => !a.StartsWith("-")));
 
         if (!Repository.Contains(path))
-            throw new GitkoException("Fajl mora biti unutar gitko repozitorijuma");
+            throw new SnapException("Fajl mora biti unutar snap repozitorijuma");
 
         string rootPath = Repository.Root;
         string relativePath = Repository.RelativePath(path);
@@ -44,10 +44,10 @@ public class RmCommand : Command
 
         List<string> matches = index.PathsUnder(relativePath);
         if (matches.Count == 0)
-            throw new GitkoException("Fajl nije praćen: " + relativePath);
+            throw new SnapException("Fajl nije praćen: " + relativePath);
 
         if (!recursive && !index.Entries.ContainsKey(relativePath))
-            throw new GitkoException($"{relativePath} je folder. Za brisanje foldera koristi -r.");
+            throw new SnapException($"{relativePath} je folder. Za brisanje foldera koristi -r.");
 
         foreach (string entry in matches)
         {
